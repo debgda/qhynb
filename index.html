@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fffaf6">
+<meta name="description" content="一份只写给你的故事，从相识，到现在。">
+<title>我们的故事 · 给你</title>
+<style>
+:root{
+  --bg:#fffaf6;
+  --bg2:#fff4ef;
+  --ink:#403733;
+  --muted:#847771;
+  --rose:#e5a0ac;
+  --rose-soft:#f7dce0;
+  --brown:#51423c;
+  --line:rgba(72,57,49,.11);
+  --glass:rgba(255,255,255,.62);
+  --shadow:0 22px 60px rgba(74,53,46,.13);
+  --shadow2:0 10px 30px rgba(74,53,46,.10);
+  --radius:28px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; color:var(--ink);
+  font-family:"Noto Serif SC","Songti SC","STSong",serif;
+  background:
+   radial-gradient(circle at 10% 0%,rgba(247,220,224,.8),transparent 24%),
+   radial-gradient(circle at 92% 20%,rgba(249,219,203,.48),transparent 22%),
+   linear-gradient(180deg,var(--bg),var(--bg2) 45%,#fff9f5);
+  overflow-x:hidden;
+}
+body.lock{overflow:hidden}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:100;
+  opacity:.06;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+button{font:inherit}
+img{max-width:100%}
+.hidden{display:none!important}
+
+/* Loading / intro */
+.intro{
+  position:fixed; inset:0; z-index:999; display:grid; place-items:center;
+  background:linear-gradient(180deg,#fffaf6,#fdf1ee);
+  transition:opacity 1s ease, visibility 1s ease;
+}
+.intro.hide{opacity:0;visibility:hidden;pointer-events:none}
+.envelope-wrap{width:min(88vw,620px);text-align:center}
+.envelope{
+  width:min(76vw,420px);height:270px;margin:0 auto 28px;position:relative;cursor:pointer;
+  filter:drop-shadow(0 20px 28px rgba(66,48,42,.15)); transition:.5s ease;
+}
+.envelope:hover{transform:translateY(-6px) rotate(-1deg)}
+.env-back,.env-front,.env-flap{
+  position:absolute;inset:0;border-radius:18px;
+}
+.env-back{background:#f8ded8;border:1px solid rgba(100,63,54,.12)}
+.env-front{
+  background:linear-gradient(180deg,#f5d6d0,#f8e5df);
+  clip-path:polygon(0 48%,50% 78%,100% 48%,100% 100%,0 100%);
+}
+.env-flap{
+  background:linear-gradient(180deg,#f9e6e0,#f4d1ca);
+  clip-path:polygon(0 0,100% 0,50% 59%);
+  transform-origin:top center; transition:transform .8s cubic-bezier(.2,.85,.25,1);
+  z-index:4;
+}
+.envelope.open .env-flap{transform:rotateX(180deg)}
+.seal{
+  position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);z-index:5;
+  width:58px;height:58px;border-radius:50%;display:grid;place-items:center;
+  background:#fff7f3;border:1px solid rgba(96,66,57,.12);font-size:25px;
+  transition:.4s ease;
+}
+.envelope.open .seal{opacity:0;transform:translate(-50%,-50%) scale(.7)}
+.intro h1{font-size:clamp(34px,7vw,62px);margin:0 0 10px;font-weight:600}
+.intro p{margin:0;color:var(--muted);line-height:1.9}
+.intro .hint{margin-top:18px;font-size:12px;letter-spacing:.2em;opacity:.72}
+
+/* Floating controls */
+.music-btn,.progress{
+  position:fixed;z-index:120;
+}
+.music-btn{
+  top:18px;right:18px;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);
+  background:rgba(255,255,255,.72);backdrop-filter:blur(10px);box-shadow:var(--shadow2);
+  cursor:pointer;display:grid;place-items:center;font-size:18px;
+}
+.music-btn.playing{animation:spin 5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress{
+  top:0;left:0;width:100%;height:3px;background:transparent;
+}
+.progress span{display:block;height:100%;width:0;background:var(--rose);transition:width .1s linear}
+
+/* Ambient floating bits */
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}
+.float{position:absolute;font-size:28px;opacity:.45;animation:floatY 7s ease-in-out infinite}
+.float:nth-child(1){left:5%;top:22%}.float:nth-child(2){right:8%;top:30%;animation-delay:-1.8s}
+.float:nth-child(3){left:12%;bottom:19%;animation-delay:-3.3s}.float:nth-child(4){right:12%;bottom:10%;animation-delay:-4.8s}
+@keyframes floatY{50%{transform:translateY(-18px) rotate(9deg)}}
+
+/* Main layout */
+.story{max-width:1180px;margin:auto;padding:0 22px 120px;position:relative;z-index:3}
+.cover{
+  min-height:100svh;display:grid;place-items:center;position:relative;padding:80px 22px 50px;
+}
+.cover-inner{text-align:center;max-width:880px}
+.eyebrow{
+  display:inline-block;padding:9px 15px;border:1px solid var(--line);border-radius:999px;
+  background:rgba(255,255,255,.65);font-size:11px;color:var(--muted);letter-spacing:.18em;
+  backdrop-filter:blur(10px);
+}
+.cover h1{
+  margin:25px 0 18px;font-size:clamp(50px,9vw,108px);line-height:1;letter-spacing:.05em;
+  font-weight:600;
+}
+.cover p{font-size:18px;line-height:2.05;color:var(--muted);max-width:700px;margin:auto}
+.scroll-hint{margin-top:52px;color:var(--muted);font-size:11px;letter-spacing:.24em;animation:breathe 2.2s infinite}
+@keyframes breathe{50%{transform:translateY(5px);opacity:.55}}
+
+.chapter{
+  min-height:92svh;display:grid;align-items:center;padding:90px 0;position:relative;
+}
+.chapter.compact{min-height:auto;padding:85px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
+@media(max-width:820px){.grid2{grid-template-columns:1fr;gap:25px}.chapter{min-height:auto;padding:72px 0}}
+.kicker{font-size:11px;letter-spacing:.24em;color:#a4767d;margin-bottom:16px}
+h2{font-size:clamp(35px,5vw,68px);line-height:1.12;margin:0 0 22px;font-weight:600}
+.lead{font-size:18px;line-height:2.08;color:var(--muted);max-width:720px}
+.meta{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:13px;margin:10px 0 27px;flex-wrap:wrap}
+.date{padding:6px 11px;border-radius:999px;background:var(--rose-soft);color:#78575e;font-size:11px}
+.quote{
+  font-size:clamp(22px,3.5vw,37px);line-height:1.7;color:#594942;
+  border-left:2px solid var(--rose);padding:12px 0 12px 24px;margin:28px 0;
+}
+.card,.letter{
+  background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,252,248,.66));
+  border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow);backdrop-filter:blur(13px);
+  border-radius:var(--radius);padding:clamp(25px,5vw,48px);
+}
+.photo{
+  background:#fff;padding:12px 12px 45px;border-radius:9px;box-shadow:var(--shadow);
+  transform:rotate(-1.4deg);transition:transform .45s ease, box-shadow .45s ease;cursor:zoom-in;
+  position:relative;
+}
+.photo:nth-child(2n){transform:rotate(1.2deg)}
+.photo:hover{transform:translateY(-6px) rotate(0);box-shadow:0 30px 65px rgba(74,53,46,.18)}
+.photo img{width:100%;display:block;max-height:600px;object-fit:cover;border-radius:3px}
+.caption{text-align:center;color:#766b65;font-size:13px;margin-top:11px}
+.scrapbook{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+.scrap{grid-column:span 6}.wide{grid-column:span 7}.tall{grid-column:span 5}.half{grid-column:span 6}.third{grid-column:span 4}
+@media(max-width:820px){.scrap,.wide,.tall,.half,.third{grid-column:1/-1}}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:700px){.duo{grid-template-columns:1fr}}
+.sticker{
+  display:inline-flex;align-items:center;gap:8px;padding:10px 14px;margin:6px 5px 0 0;
+  background:#fff;border:1px solid var(--line);border-radius:999px;box-shadow:var(--shadow2);font-size:13px
+}
+.small-note{font-size:13px;color:#9b8d86;line-height:1.8}
+.timeline{position:relative;margin-top:44px}
+.timeline:before{content:"";position:absolute;left:17px;top:0;bottom:0;width:1px;background:var(--line)}
+.t-item{position:relative;padding:0 0 48px 55px}
+.dot{position:absolute;left:10px;top:5px;width:15px;height:15px;border-radius:50%;background:#efb5bf;box-shadow:0 0 0 8px rgba(255,255,255,.65)}
+.t-item h3{font-size:22px;margin:0 0 7px}.t-item p{color:var(--muted);line-height:1.95;margin:0}
+
+/* Letter */
+.letter{position:relative;overflow:hidden}
+.letter:after{
+ content:"";position:absolute;right:-70px;top:-70px;width:190px;height:190px;border-radius:50%;
+ background:rgba(248,216,222,.55)
+}
+.letter p{font-size:18px;line-height:2.15;margin:0 0 16px;position:relative;z-index:1}
+.sign{text-align:right;color:var(--muted);margin-top:30px}
+
+/* Scroll reveal */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity 1s ease,transform 1s ease}
+.reveal.on{opacity:1;transform:none}
+.delay1{transition-delay:.15s}.delay2{transition-delay:.3s}.delay3{transition-delay:.45s}
+
+/* Interaction / cursor hearts */
+.heart-pop{
+  position:fixed;pointer-events:none;z-index:150;font-size:18px;
+  animation:heartFly 1.15s ease-out forwards;
+}
+@keyframes heartFly{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}
+  18%{opacity:1}
+  100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% - 100px)) scale(1.25) rotate(18deg)}
+}
+
+/* Image viewer */
+.lightbox{
+ position:fixed;inset:0;background:rgba(37,28,25,.78);z-index:180;
+ display:grid;place-items:center;padding:25px;opacity:0;visibility:hidden;transition:.35s;
+}
+.lightbox.show{opacity:1;visibility:visible}
+.lightbox img{max-width:min(94vw,1100px);max-height:86vh;object-fit:contain;border-radius:10px;box-shadow:0 25px 80px rgba(0,0,0,.28)}
+.lightbox .close{position:absolute;right:22px;top:18px;color:white;background:none;border:0;font-size:30px;cursor:pointer}
+
+/* Cat helper */
+.cat-helper{
+ position:fixed;right:22px;bottom:20px;z-index:125;width:66px;height:66px;border-radius:50%;
+ display:grid;place-items:center;background:rgba(255,255,255,.78);border:1px solid var(--line);
+ box-shadow:var(--shadow2);font-size:32px;backdrop-filter:blur(10px);cursor:pointer;
+ transition:.25s;
+}
+.cat-helper:hover{transform:translateY(-4px) rotate(-4deg)}
+.cat-bubble{
+ position:fixed;right:28px;bottom:92px;z-index:125;max-width:260px;padding:12px 15px;
+ background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow2);
+ font-size:13px;line-height:1.7;color:var(--muted);opacity:0;transform:translateY(8px);
+ pointer-events:none;transition:.35s;
+}
+.cat-bubble.show{opacity:1;transform:none}
+
+/* Final scene */
+.final{
+ min-height:100svh;display:grid;place-items:center;position:relative;text-align:center;padding:60px 20px;
+ background:
+   radial-gradient(circle at 50% 45%,rgba(247,215,220,.58),transparent 28%),
+   linear-gradient(180deg,#fff8f5,#fffaf6);
+}
+.final .box{max-width:800px}
+.final-line{opacity:0;transform:translateY(12px);transition:1s ease;margin:12px 0}
+.final.show .final-line{opacity:1;transform:none}
+.final.show .final-line:nth-child(2){transition-delay:.55s}
+.final.show .final-line:nth-child(3){transition-delay:1.05s}
+.final.show .final-line:nth-child(4){transition-delay:1.65s}
+.final .big{font-size:clamp(34px,6.5vw,72px);font-weight:600;line-height:1.18}
+.final .sub{font-size:18px;line-height:2;color:var(--muted)}
+.final-cta{
+ margin-top:30px;padding:13px 24px;border:0;border-radius:999px;background:var(--brown);color:#fff;
+ box-shadow:0 16px 35px rgba(81,66,60,.2);cursor:pointer;transition:.25s
+}
+.final-cta:hover{transform:translateY(-2px)}
+.secret{margin-top:28px;font-size:16px;line-height:2;color:var(--muted);max-height:0;overflow:hidden;opacity:0;transition:1s}
+.secret.open{max-height:260px;opacity:1}
+.paw{position:absolute;right:10%;bottom:12%;font-size:48px;opacity:.22;transform:rotate(-18deg)}
+.footer{text-align:center;color:#a1958f;font-size:11px;letter-spacing:.16em;padding:0 0 34px}
+
+/* Progress hint */
+.section-count{
+ position:fixed;left:18px;bottom:18px;z-index:120;padding:8px 11px;border-radius:999px;
+ background:rgba(255,255,255,.64);backdrop-filter:blur(10px);font-size:10px;letter-spacing:.12em;color:var(--muted);
+ border:1px solid var(--line)
+}
+@media(max-width:600px){
+ .music-btn{top:12px;right:12px}.section-count{left:12px;bottom:12px}
+ .cat-helper{right:12px;bottom:12px}.cat-bubble{right:18px;bottom:84px}
+}
+</style>
+</head>
+<body class="lock">
+<div class="intro" id="intro">
+  <div class="envelope-wrap">
+    <div class="envelope" id="envelope" aria-label="打开信封">
+      <div class="env-back"></div><div class="env-front"></div><div class="env-flap"></div><div class="seal">♡</div>
+    </div>
+    <h1>给你</h1>
+    <p>这里藏着一些，我一直记得的事。</p>
+    <div class="hint">点一下信封，打开故事</div>
+  </div>
+</div>
+
+<div class="progress"><span id="progress"></span></div>
+<button class="music-btn" id="musicBtn" title="播放 / 暂停音乐">♫</button>
+<audio id="bgm" loop preload="none">
+  <source src="assets/music.mp3" type="audio/mpeg">
+</audio>
+
+<div class="ambient" aria-hidden="true">
+  <div class="float">🐾</div><div class="float">🐱</div><div class="float">🐶</div><div class="float">✦</div>
+</div>
+
+<div class="section-count" id="count">01 / 09</div>
+<button class="cat-helper" id="catHelper" title="点我一下">🐱</button>
+<div class="cat-bubble" id="catBubble"></div>
+
+<section class="cover">
+  <div class="cover-inner">
+    <span class="eyebrow">给你的一份小小礼物</span>
+    <h1>我们的故事</h1>
+    <p>我不是一个爱拍照的人，所以留下来的照片并不多。<br>但那些和你一起经历过的事情，我好像一直记得。</p>
+    <div class="scroll-hint">向下滑，故事从这里开始 ↓</div>
+  </div>
+</section>
+
+<main class="story" id="story">
+  <!-- 01 那一天 -->
+  <section class="chapter" data-section="1">
+    <div class="grid2">
+      <div class="reveal">
+        <div class="kicker">01 · 那一天</div>
+        <h2>故事的开始，<br>其实很普通。</h2>
+        <div class="meta"><span class="date">2026 / 7 / 19</span><span>湖北 · 利川 · 忠路镇</span></div>
+        <p class="lead">2026 年 7 月 19 日下午四点多，天很蓝，空气很清晰，忠路到处都在修房子。因为邱老师的安排，我们见了人生中的第一面。</p>
+        <div class="quote">那时候的我，大概不会想到，这个普通的下午，会变成后来故事的开头。</div>
+      </div>
+      <div class="reveal delay1">
+        <div class="photo"><img src="assets/街景.jpg" alt="忠路镇的街道，蓝天，正在修房子"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 续：初见那几天的碎片 -->
+  <section class="chapter compact" data-section="1">
+    <div class="scrapbook">
+      <div class="scrap wide reveal"><div class="photo"><img src="assets/第一次去你家.jpg" alt="三个人走在去你家的路上"><div class="caption">那天，我们四个人一起，往你家的方向走。</div></div></div>
+      <div class="scrap tall reveal delay1"><div class="photo"><img src="assets/在你家里吃的第一顿饭.jpg" alt="在你家里吃的第一顿饭"><div class="caption">在你家吃到的第一顿饭。</div></div></div>
+      <div class="scrap reveal delay2"><div class="photo"><img src="assets/你家乡的照片.jpg" alt="你家乡河边的风景"><div class="caption">你的家乡，一条河从镇中间穿过去。</div></div></div>
+    </div>
+    <div class="reveal delay3" style="margin-top:34px;text-align:center">
+      <p class="lead" style="margin:auto">有时候，故事并不是从一句"我喜欢你"开始。<br>它可能只是从一起吃一顿饭、一起走一段路开始。</p>
+    </div>
+  </section>
+
+  <!-- 02 十天 -->
+  <section class="chapter" data-section="2">
+    <div class="grid2">
+      <div class="reveal">
+        <div class="kicker">02 · 十天</div>
+        <h2>那十天，<br>我们一起跑过很多地方。</h2>
+        <p class="lead">我们一起进行长达十天的访谈工作，一起跑过山路，得过流感，看过黄连，笑过万浩哲每次都要上厕所。</p>
+        <div class="sticker">🌿 一起看过黄连</div><div class="sticker">🚶 一起跑过山路</div>
+        <div class="sticker">🤒 一起得过流感</div><div class="sticker">😂 一起笑过奇怪的小事</div>
+        <p class="small-note" style="margin-top:18px">可惜的是，那时候我没有留下多少照片。现在翻遍相册，也只找到这些。</p>
+      </div>
+      <div class="duo reveal delay1">
+        <div class="photo"><img src="assets/三人工作照片.jpg" alt="三个人围着火炉做访谈"><div class="caption">围着火炉，一户一户地聊。</div></div>
+        <div class="photo"><img src="assets/你访谈时的照片.jpg" alt="你认真访谈记录的样子"></div>
+        <div class="photo"><img src="assets/你在田里的照片.jpg" alt="你蹲在黄连田里拿着问卷"></div>
+        <div class="photo"><img src="assets/访谈时看的黄连.jpg" alt="我们一起看过的黄连大棚"><div class="caption">就是这样一片一片的黄连。</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 续：访谈路上 -->
+  <section class="chapter compact" data-section="2">
+    <div class="scrapbook">
+      <div class="scrap wide reveal"><div class="photo"><img src="assets/访谈照片2.jpg" alt="访谈路上的照片"></div></div>
+      <div class="scrap tall reveal delay1"><div class="photo"><img src="assets/访谈的风景.jpg" alt="谋道镇卫生院"><div class="caption">在谋道爬山的风景</div></div></div>
+    </div>
+  </section>
+
+  <!-- 03 后来 -->
+  <section class="chapter" data-section="3">
+    <div class="card reveal">
+      <div class="kicker">03 · 后来</div>
+      <h2>我们本来应该，<br>各回各家，各奔东西。</h2>
+      <p class="lead">但是，因为一句话，让我们的命运又重新缠绕在一起。</p>
+      <div class="quote">我觉得我们的感情，是从那句特朗普的抖音正式开始的。<br><span style="font-size:.55em;color:var(--muted)">感谢特朗普。</span></div>
+      <div class="timeline">
+        <div class="t-item"><span class="dot"></span><h3>一句话</h3><p>时间：<span class="date">2026 / 8 / 4</span><br>就是从这里开始，我们没有真的走散。</p></div>
+        <div class="t-item"><span class="dot"></span><h3>然后，每天都在聊天</h3><p>我给你分享猎奇视频，你给我分享猫猫狗狗。我们好像很聊得来，经常一刷就是深夜。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 续：那张聊天截图 -->
+  <section class="chapter compact" data-section="3">
+    <div class="grid2">
+      <div class="reveal"><div class="photo"><img src="assets/特朗普抖音聊天记录.jpg" alt="8月4日关于特朗普抖音的聊天记录"><div class="caption">就是这一天，这句话。</div></div></div>
+      <div class="reveal delay1">
+        <p class="lead">谁也想不到那天的随口一句<br>竟会成为我们关系的真正起点</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 你的喜好 -->
+  <section class="chapter compact" data-section="4">
+    <div class="grid2">
+      <div class="reveal">
+        <div class="kicker">04 · 猫猫、狗狗、还有噜噜</div>
+        <h2>我开始一点点，<br>记住你的喜好。</h2>
+        <p class="lead">那时候我知道了，你养了一只叫布丁的小猫；知道了你的生日是大年初三；也知道了你喜欢的角色是噜噜。</p>
+        <div class="sticker">🐱 布丁</div><div class="sticker">🐶 猫猫狗狗</div><div class="sticker">🧡 噜噜</div>
+      </div>
+      <div class="duo reveal delay1">
+        <div class="photo"><img src="assets/布丁照片.jpg" alt="你的小猫布丁"><div class="caption">布丁，一只圆滚滚的小橘猫。</div></div>
+        <div class="photo"><img src="assets/噜噜.webp" alt="你喜欢的角色噜噜"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 好像有一点喜欢 -->
+  <section class="chapter compact" data-section="4">
+    <div class="grid2">
+      <div class="reveal">
+        <div class="kicker">05 · 好像有一点喜欢</div>
+        <h2>我不知道那是不是喜欢。</h2>
+        <p class="lead">你喜欢和我说一些生活中的琐事，我也很乐意当这个听众。相处过程中，慢慢的我发现，我好像有点喜欢你了。</p>
+        <p class="lead">我当时并不清楚那是不是喜欢，也不知道你对我到底是什么感觉。我只知道，和你聊天挺舒服的。</p>
+        <p class="small-note">我不敢做出什么越界的举动，因为我害怕我们最后连朋友都当不成。</p>
+      </div>
+      <div class="reveal delay1">
+        <div class="card" style="text-align:center">
+          <div style="font-size:46px;line-height:1">♡</div>
+          <p class="lead" style="margin:18px auto 0">那时候的喜欢，是小心翼翼藏在对话框里的。<br>打了又删，删了又打，最后发出去的还是一句"在干嘛"。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 那幅画 -->
+  <section class="chapter" data-section="5">
+    <div class="grid2">
+      <div class="reveal">
+        <div class="kicker">06 · 那幅画</div>
+        <h2>然后，你突然给我做了一幅画。</h2>
+        <p class="lead">那时候我在想：</p>
+        <div class="quote>"我去，你对我好像不仅仅只是友情，<br>你好像有点喜欢我啊！"</div>
+        <p class="small-note">时间：2026 / 9 / 12<br>这张画我一直存着，没舍得删。</p>
+      </div>
+      <div class="reveal delay1"><div class="photo"><img src="assets/为我画的画.jpg" alt="你为我画的那幅小画，配上那句好了"><div class="caption">你画的我，还挺像那么回事的。</div></div></div>
+    </div>
+  </section>
+
+  <!-- 07 发起冲锋 -->
+  <section class="chapter" data-section="6">
+    <div class="grid2">
+      <div class="reveal">
+        <div class="kicker">07 · 发起冲锋</div>
+        <h2>不能再拖了。</h2>
+        <p class="lead">得趁着我们新鲜感还在的时候赶紧表明心意。于是，在室友的怂恿下，借着你考计算机的机会，我发起了冲锋。</p>
+        <p class="lead">虽然后面搞砸了，但结果是好的，嘿嘿嘿。</p>
+      </div>
+      <div class="reveal delay1"><div class="photo"><img src="assets/赛博婚礼.jpg" alt="我们整蛊万浩哲的赛博婚礼，贝利亚穿婚纱"><div class="caption">我们还一起整蛊过万浩哲：赛博婚礼。</div></div></div>
+    </div>
+  </section>
+
+  <!-- 07 续：在一起以后的碎片 -->
+  <section class="chapter compact" data-section="7">
+    <div class="scrapbook">
+      <div class="scrap reveal"><div class="photo"><img src="assets/赛博婚礼2.png" alt="赛博婚礼另一张"></div></div>
+      <div class="scrap reveal delay1"><div class="photo"><img src="assets/电影票.jpg" alt="两张《奥德赛》IMAX 电影票"><div class="caption">一起看过的电影。票，我一直留着。</div></div></div>
+      <div class="scrap wide reveal delay2"><div class="photo"><img src="assets/双人成行爱心.jpg" alt="在游戏画板上画一个大红心"><div class="caption">一起通关《双人成行》。</div></div></div>
+      <div class="scrap tall reveal"><div class="photo"><img src="assets/爱心2.jpg" alt="游戏里地上长出一个爱心"><div class="caption">没错过任何一个画爱心的机会。</div></div></div>
+      <div class="scrap reveal delay1"><div class="photo"><img src="assets/爱心3.jpg" alt="游戏里用花拼出一颗爱心"></div></div>
+      <div class="scrap reveal delay2"><div class="photo"><img src="assets/爱心4.jpg" alt="游戏里土里长出一颗爱心"></div></div>
+      <div class="scrap reveal delay3"><div class="photo"><img src="assets/爱心5.jpg" alt="游戏画板上画一颗像素爱心"></div></div>
+    </div>
+  </section>
+
+  <!-- 08 现在 -->
+  <section class="chapter compact" data-section="8">
+    <div class="grid2">
+      <div class="reveal"><div class="photo"><img src="assets/接吻.jpg" alt="游戏里两个人终于接吻"></div></div>
+      <div class="reveal delay1">
+        <div class="kicker">08 · 现在</div>
+        <h2>你说我们是<br>模模糊糊就在一起了。</h2>
+        <p class="lead">但我还记得我们相处的每一个节点。</p>
+        <p class="lead">我写下这些，是想把那些零零碎碎的记忆认真地放在一起。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 写给你 -->
+  <section class="chapter" data-section="9">
+    <div class="letter reveal">
+      <div class="kicker">09 · 写给你</div>
+      <p>我不是一个很会拍照的人，也不是一个特别擅长把喜欢说出来的人。</p>
+      <p>所以我用了这个笨办法，把我们经历过的这些事情慢慢写下来。</p>
+      <p>从第一次见面的那个下午，到后来每天聊天，到一起看电影、一起玩游戏，再到现在。</p>
+      <p>回头看的时候，我才发现，原来喜欢不是某一个瞬间突然发生的。</p>
+      <p>它可能只是发生在很多个"你刚好也在"的时刻里。</p>
+      <p>而我很庆幸，那些时刻都有你。</p>
+      <p>谢谢你来到我的故事里。</p>
+      <p>接下来的故事，我还是想和你一起写。</p>
+      <div class="sign">—— 邓楷</div>
+    </div>
+  </section>
+</main>
+
+<section class="final" id="final">
+  <div class="box">
+    <div class="final-line big">我们的故事才刚刚开始。</div>
+    <div class="final-line big">所以……</div>
+    <div class="final-line sub">看完以后，先别急着回我。</div>
+    <div class="final-line big">下楼有惊喜</div>
+    <button class="final-cta" id="go">我看完了</button>
+    <div class="secret" id="secret">
+      嘿嘿嘿嘿，快下楼<br>
+      <strong style="font-size:22px;color:var(--brown)">我在楼下等你。</strong><br>
+      <span style="font-size:26px">🐾</span>
+    </div>
+  </div>
+  <div class="paw">🐾</div>
+</section>
+<div class="footer">这不是结尾。只是我们故事的下一页。</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="close" id="closeBox" aria-label="关闭">×</button>
+  <img id="lightImg" src="" alt="">
+</div>
+
+<script>
+const qs=(s)=>document.querySelector(s);
+const qsa=(s)=>document.querySelectorAll(s);
+
+const intro=qs('#intro'), envelope=qs('#envelope');
+envelope.addEventListener('click',()=>{
+  envelope.classList.add('open');
+  setTimeout(()=>{
+    intro.classList.add('hide');
+    document.body.classList.remove('lock');
+    window.scrollTo({top:0,behavior:'instant'});
+    tryStartMusic();
+  },720);
+});
+
+const bgm=qs('#bgm'), musicBtn=qs('#musicBtn');
+function tryStartMusic(){
+  bgm.volume=.28;
+  bgm.play().then(()=>musicBtn.classList.add('playing')).catch(()=>{});
+}
+musicBtn.addEventListener('click',()=>{
+  if(bgm.paused){bgm.play().then(()=>musicBtn.classList.add('playing')).catch(()=>{});}
+  else{bgm.pause();musicBtn.classList.remove('playing');}
+});
+bgm.addEventListener('play',()=>musicBtn.classList.add('playing'));
+bgm.addEventListener('pause',()=>musicBtn.classList.remove('playing'));
+
+const observer=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')});
+},{threshold:.12});
+qsa('.reveal').forEach(el=>observer.observe(el));
+
+const final=qs('#final');
+new IntersectionObserver((entries)=>entries.forEach(e=>{if(e.isIntersecting)final.classList.add('show')}),{threshold:.2}).observe(final);
+
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement.scrollHeight-innerHeight;
+  qs('#progress').style.width=Math.max(0,Math.min(100,scrollY/h*100))+'%';
+  const sections=[...qsa('[data-section]')];
+  let current=1;
+  let best=Infinity;
+  sections.forEach(s=>{
+    const r=s.getBoundingClientRect();
+    const d=Math.abs(r.top-innerHeight*.33);
+    if(d<best){best=d;current=Number(s.dataset.section)}
+  });
+  qs('#count').textContent=String(Math.min(9,Math.max(1,current))).padStart(2,'0')+' / 09';
+},{passive:true});
+
+function heartBurst(x,y){
+  const el=document.createElement('span');
+  el.className='heart-pop';
+  el.textContent=['♡','♥','✦','🐾'][Math.floor(Math.random()*4)];
+  el.style.left=x+'px';el.style.top=y+'px';
+  el.style.setProperty('--dx',(Math.random()*80-40)+'px');
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1200);
+}
+document.addEventListener('click',(e)=>{
+  if(e.target.closest('button,.envelope'))return;
+  heartBurst(e.clientX,e.clientY);
+});
+
+qsa('.photo').forEach(card=>{
+  card.addEventListener('click',()=>{
+    const im=card.querySelector('img'); if(!im?.src)return;
+    qs('#lightImg').src=im.src; qs('#lightImg').alt=im.alt||'';
+    qs('#lightbox').classList.add('show');
+  });
+});
+qs('#closeBox').addEventListener('click',()=>qs('#lightbox').classList.remove('show'));
+qs('#lightbox').addEventListener('click',(e)=>{if(e.target.id==='lightbox')qs('#lightbox').classList.remove('show')});
+document.addEventListener('keydown',(e)=>{if(e.key==='Escape')qs('#lightbox').classList.remove('show')});
+
+const catMessages=[
+  '喵～我觉得这个故事应该继续往下看。',
+  '这里有你喜欢的猫猫狗狗，还有噜噜。',
+  '不要急，最下面还有一句话。',
+  '我听说，有人正在楼下等你。',
+  '🐾 噜噜让我来提醒你：继续往下。'
+];
+let catIndex=0,catTimer;
+qs('#catHelper').addEventListener('click',()=>{
+  const b=qs('#catBubble');
+  b.textContent=catMessages[catIndex%catMessages.length];catIndex++;
+  b.classList.add('show');
+  clearTimeout(catTimer);catTimer=setTimeout(()=>b.classList.remove('show'),3200);
+});
+
+qs('#go').addEventListener('click',()=>{
+  qs('#secret').classList.add('open');
+  qs('#go').textContent='那就下楼见';
+  for(let i=0;i<9;i++){
+    setTimeout(()=>heartBurst(innerWidth/2+(Math.random()*160-80),innerHeight/2+(Math.random()*60-30)),i*130);
+  }
+});
+</script>
+</body>
+</html>
